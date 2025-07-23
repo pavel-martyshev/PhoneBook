@@ -14,11 +14,9 @@ public class PhoneBookContext(DbContextOptions<PhoneBookContext> options) : DbCo
         modelBuilder.Entity<Contact>(b =>
         {
             b.Property(c => c.FirstName)
-                .IsRequired()
                 .HasMaxLength(50);
 
             b.Property(c => c.LastName)
-                .IsRequired()
                 .HasMaxLength(50);
 
             b.Property(c => c.MiddleName).HasMaxLength(50);
@@ -27,13 +25,12 @@ public class PhoneBookContext(DbContextOptions<PhoneBookContext> options) : DbCo
         modelBuilder.Entity<PhoneNumber>(b =>
         {
             b.Property(p => p.Number)
-                .IsRequired()
                 .HasMaxLength(15);
 
             b.HasOne(p => p.Contact)
                 .WithMany(c => c.PhoneNumbers)
                 .HasForeignKey(p => p.PersonId)
-                .IsRequired();
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         var baseType = typeof(BaseModel);

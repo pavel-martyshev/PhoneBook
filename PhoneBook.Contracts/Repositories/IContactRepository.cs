@@ -5,5 +5,9 @@ namespace PhoneBook.Contracts.Repositories;
 
 public interface IContactRepository : IRepository<Contact>
 {
-    public List<ContactDto> GetContacts();
+    public Task<ContactDto?> GetContactAsync(int id);
+
+    public Task<List<ContactDto>> GetAllContactsAsync();
+
+    public Task<List<ContactDto>> GetContactsAsync(int page, int pageSize, SortFieldType sortBy, bool isSortDescending);
 }

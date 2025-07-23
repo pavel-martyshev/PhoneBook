@@ -3,23 +3,20 @@ using Quartz;
 
 namespace PhoneBook.Jobs;
 
-public class ExportContactsToExcelJob(IWebHostEnvironment webHostEnvironment, IConfiguration configuration, GetContactsHandler getContactsHandler) : IJob
+public class ExportContactsToExcelJob(IWebHostEnvironment webHostEnvironment, IConfiguration configuration, ExportHandler exportHandler) : IJob
 {
     private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
 
     private readonly IConfiguration _configuration = configuration;
 
-    private GetContactsHandler _getContactsHandler = getContactsHandler ?? throw new ArgumentNullException(nameof(getContactsHandler));
+    private readonly ExportHandler _exportHandler = exportHandler ?? throw new ArgumentNullException(nameof(exportHandler));
 
     public Task Execute(IJobExecutionContext context)
     {
-
-        _getContactsHandler.ExportContactsToExcel(Path.Combine(
+        return _exportHandler.ExportContactsToExcelOnDisk(Path.Combine(
             _webHostEnvironment.ContentRootPath,
             _configuration["UnloadingDirectory"] ?? "",
             $"Contacts-{DateTime.Now:yyyy-MM-dd HH-mm}.xlsx"
         ));
-
-        return Task.CompletedTask;
     }
 }

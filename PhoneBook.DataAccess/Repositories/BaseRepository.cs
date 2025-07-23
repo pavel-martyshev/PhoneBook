@@ -9,9 +9,9 @@ public class BaseRepository<T>(DbContext db) : IRepository<T> where T : class
 
     protected DbSet<T> _dbSet = db.Set<T>();
 
-    public void Create(T entity)
+    public async Task CreateAsync(T entity)
     {
-        _dbSet.Add(entity);
+        await _dbSet.AddAsync(entity);
     }
 
     public void Update(T entity)
@@ -30,13 +30,13 @@ public class BaseRepository<T>(DbContext db) : IRepository<T> where T : class
         _dbSet.Remove(entity);
     }
 
-    public T[] GetAll()
+    public Task<T[]> GetAllAsync()
     {
-        return _dbSet.ToArray();
+        return _dbSet.ToArrayAsync();
     }
 
-    public T? GetById(int id)
+    public ValueTask<T?> GetByIdAsync(int id)
     {
-        return _dbSet.Find(id);
+        return _dbSet.FindAsync(id);
     }
 }

@@ -2,13 +2,13 @@
 
 public interface IRepository<T> where T : class
 {
-    public void Create(T entity);
+    public Task CreateAsync(T entity);
 
     public void Update(T entity);
 
     public void Delete(T entity);
 
-    public T[] GetAll();
+    public Task<T[]> GetAllAsync();
 
-    public T? GetById(int id);
+    public ValueTask<T?> GetByIdAsync(int id);
 }
