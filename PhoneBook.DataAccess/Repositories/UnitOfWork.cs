@@ -10,16 +10,16 @@ public class UnitOfWork(PhoneBookContext db) : IUnitOfWork
 
     public IContactRepository ContactRepository { get; set; } = new ContactRepository(db);
 
-    public Task SaveAsync()
+    public async Task SaveAsync()
     {
         ObjectDisposedException.ThrowIf(_disposed, db);
 
         if (_db.Database.CurrentTransaction != null)
         {
-            return _db.Database.CommitTransactionAsync();
+            await _db.Database.CommitTransactionAsync();
         }
 
-        return _db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
     }
 
     public Task BeginTransactionAsync()
