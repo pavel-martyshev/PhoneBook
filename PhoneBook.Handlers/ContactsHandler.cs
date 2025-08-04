@@ -20,6 +20,7 @@ public class ContactsHandler(IUnitOfWork uow)
 
     public async Task<bool> DeleteContactAsync(int id)
     {
+        await _uow.BeginTransactionAsync();
         var contact = await _uow.ContactRepository.GetByIdAsync(id);
 
         if (contact is null)
@@ -27,7 +28,6 @@ public class ContactsHandler(IUnitOfWork uow)
             return false;
         }
 
-        await _uow.BeginTransactionAsync();
         _uow.ContactRepository.Delete(contact);
         await _uow.SaveAsync();
 
@@ -36,13 +36,13 @@ public class ContactsHandler(IUnitOfWork uow)
 
     public async Task<ContactDto> CreateContactAsync(ContactDto contactDto)
     {
-        var contact = new Contact()
+        var contact = new Contact
         {
             FirstName = contactDto.FirstName,
             MiddleName = contactDto.MiddleName,
             LastName = contactDto.LastName,
             PhoneNumbers = contactDto.PhoneNumbers
-                .Select(p => new PhoneNumber()
+                .Select(p => new PhoneNumber
                 {
                     Number = p.Number,
                     Type = p.Type
@@ -73,6 +73,7 @@ public class ContactsHandler(IUnitOfWork uow)
 
     public async Task<ContactDto?> UpdateContactAsync(ContactDto contactDto)
     {
+        await _uow.BeginTransactionAsync();
         var contact = await _uow.ContactRepository.GetByIdAsync(contactDto.Id);
 
         if (contact is null)
@@ -86,7 +87,7 @@ public class ContactsHandler(IUnitOfWork uow)
 
         foreach (var number in contact.PhoneNumbers)
         {
-            if (!contactDto.PhoneNumbers.Select(p => p.Number).ToList().Contains(number.Number))
+            if (!contactDto.PhoneNumbers.Any(p => p.Number == number.Number))
             {
                 number.IsDeleted = true;
             }
@@ -94,7 +95,7 @@ public class ContactsHandler(IUnitOfWork uow)
 
         foreach (var dtoNumber in contactDto.PhoneNumbers)
         {
-            if (!contact.PhoneNumbers.Select(p => p.Number).ToList().Contains(dtoNumber.Number))
+            if (!contact.PhoneNumbers.Any(p => p.Number == dtoNumber.Number))
             {
                 var number = new PhoneNumber()
                 {
@@ -103,6 +104,15 @@ public class ContactsHandler(IUnitOfWork uow)
                 };
 
                 contact.PhoneNumbers.Add(number);
+            }
+
+            if (contact.PhoneNumbers.Any(p => p.Number == dtoNumber.Number && p.Type != dtoNumber.Type))
+            {
+                var number = contact.PhoneNumbers
+                    .Where(p => p.Number == dtoNumber.Number)
+                    .FirstOrDefault();
+
+                number!.Type = dtoNumber.Type;
             }
         }
 

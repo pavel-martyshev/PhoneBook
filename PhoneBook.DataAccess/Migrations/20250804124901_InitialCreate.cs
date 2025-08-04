@@ -36,7 +36,7 @@ namespace PhoneBook.DataAccess.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Number = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    ContactId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset(0)", nullable: false, defaultValueSql: "CAST(SYSDATETIMEOFFSET() AS datetimeoffset(0))"),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
@@ -44,17 +44,17 @@ namespace PhoneBook.DataAccess.Migrations
                 {
                     table.PrimaryKey("PK_PhoneNumbers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PhoneNumbers_Contacts_PersonId",
-                        column: x => x.PersonId,
+                        name: "FK_PhoneNumbers_Contacts_ContactId",
+                        column: x => x.ContactId,
                         principalTable: "Contacts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PhoneNumbers_PersonId",
+                name: "IX_PhoneNumbers_ContactId",
                 table: "PhoneNumbers",
-                column: "PersonId");
+                column: "ContactId");
         }
 
         /// <inheritdoc />

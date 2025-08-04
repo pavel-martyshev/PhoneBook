@@ -29,7 +29,7 @@ public class PhoneBookContext(DbContextOptions<PhoneBookContext> options) : DbCo
 
             b.HasOne(p => p.Contact)
                 .WithMany(c => c.PhoneNumbers)
-                .HasForeignKey(p => p.PersonId)
+                .HasForeignKey(p => p.ContactId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 

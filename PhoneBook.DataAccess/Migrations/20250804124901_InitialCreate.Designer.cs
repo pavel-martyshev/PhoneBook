@@ -12,7 +12,7 @@ using PhoneBook.DataAccess;
 namespace PhoneBook.DataAccess.Migrations
 {
     [DbContext(typeof(PhoneBookContext))]
-    [Migration("20250708173251_InitialCreate")]
+    [Migration("20250804124901_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -28,7 +28,7 @@ namespace PhoneBook.DataAccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("PhoneBook.DataAccess.Models.Contact", b =>
+            modelBuilder.Entity("PhoneBook.DataModels.Contact", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -65,13 +65,16 @@ namespace PhoneBook.DataAccess.Migrations
                     b.ToTable("Contacts");
                 });
 
-            modelBuilder.Entity("PhoneBook.DataAccess.Models.PhoneNumber", b =>
+            modelBuilder.Entity("PhoneBook.DataModels.PhoneNumber", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ContactId")
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -88,31 +91,28 @@ namespace PhoneBook.DataAccess.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
-                    b.Property<int>("PersonId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PersonId");
+                    b.HasIndex("ContactId");
 
                     b.ToTable("PhoneNumbers");
                 });
 
-            modelBuilder.Entity("PhoneBook.DataAccess.Models.PhoneNumber", b =>
+            modelBuilder.Entity("PhoneBook.DataModels.PhoneNumber", b =>
                 {
-                    b.HasOne("PhoneBook.DataAccess.Models.Contact", "Contact")
+                    b.HasOne("PhoneBook.DataModels.Contact", "Contact")
                         .WithMany("PhoneNumbers")
-                        .HasForeignKey("PersonId")
+                        .HasForeignKey("ContactId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Contact");
                 });
 
-            modelBuilder.Entity("PhoneBook.DataAccess.Models.Contact", b =>
+            modelBuilder.Entity("PhoneBook.DataModels.Contact", b =>
                 {
                     b.Navigation("PhoneNumbers");
                 });

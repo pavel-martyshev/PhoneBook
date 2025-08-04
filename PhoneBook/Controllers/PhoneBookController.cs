@@ -27,7 +27,7 @@ public class PhoneBookController(IConfiguration configuration, ContactsHandler c
         return CreatedAtAction(nameof(GetContact), new { id = newContactDto.Id }, newContactDto);
     }
 
-    [HttpPost]
+    [HttpPut]
     public async Task<IActionResult> UpdateContact(ContactDto contactDto)
     {
         if (!ModelState.IsValid)
@@ -87,10 +87,11 @@ public class PhoneBookController(IConfiguration configuration, ContactsHandler c
         return Ok(await _contactsHandler.GetContactsListAsync(page, pageSize, sortBy, isSortDescending));
     }
 
+    [HttpGet]
     public async Task<IActionResult> ExportContactsToExcel()
     {
         return File(
-            await _exportHandler.ExportContactsToExcelStream(),
+            await _exportHandler.ExportContactsToExcelStreamAsync(),
             _configuration["ExcelContentType"]!,
             $"Contacts-{DateTime.Today:yyyy-MM-dd}.xlsx"
         );

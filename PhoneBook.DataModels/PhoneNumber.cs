@@ -6,7 +6,7 @@ public class PhoneNumber : BaseModel
 
     public PhoneNumberType Type { get; set; }
 
-    public int PersonId { get; set; }
+    public int ContactId { get; set; }
 
     public virtual Contact Contact { get; set; } = null!;
 }

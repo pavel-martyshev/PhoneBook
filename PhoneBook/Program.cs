@@ -10,7 +10,7 @@ namespace PhoneBook;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -67,7 +67,7 @@ public class Program
             try
             {
                 var dbInitializer = services.GetRequiredService<DbInitializer>();
-                dbInitializer.Initialize();
+                await dbInitializer.Initialize();
             }
             catch (Exception e)
             {

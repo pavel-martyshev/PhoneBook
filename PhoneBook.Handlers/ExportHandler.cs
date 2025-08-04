@@ -7,7 +7,7 @@ public class ExportHandler(IUnitOfWork unitOfWork)
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
 
-    private async Task<T> ExportContacts<T>(Func<XLWorkbook, T> saver)
+    private async Task<T> ExportContactsAsync<T>(Func<XLWorkbook, T> saver)
     {
         var contactsList = await _unitOfWork.ContactRepository.GetAllContactsAsync();
 
@@ -51,18 +51,18 @@ public class ExportHandler(IUnitOfWork unitOfWork)
         });
     }
 
-    public Task ExportContactsToExcelOnDisk(string filePath)
+    public Task ExportContactsToExcelOnDiskAsync(string filePath)
     {
-        return ExportContacts(wb =>
+        return ExportContactsAsync(wb =>
         {
             wb.SaveAs(filePath);
             return true;
         });
     }
 
-    public Task<byte[]> ExportContactsToExcelStream()
+    public Task<byte[]> ExportContactsToExcelStreamAsync()
     {
-        return ExportContacts(wb =>
+        return ExportContactsAsync(wb =>
         {
             using var stream = new MemoryStream();
             wb.SaveAs(stream);

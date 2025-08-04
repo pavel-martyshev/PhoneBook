@@ -1,12 +1,6 @@
 ﻿namespace PhoneBook.Contracts.Repositories;
 
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork : IUnitOfWorkBase
 {
-    public IContactRepository ContactRepository { get; }
-
-    public Task SaveAsync();
-
-    public Task BeginTransactionAsync();
-
-    public Task RollbackTransactionAsync();
+    IContactRepository ContactRepository { get; }
 }

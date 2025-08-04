@@ -13,7 +13,7 @@ public class ExportContactsToExcelJob(IWebHostEnvironment webHostEnvironment, IC
 
     public Task Execute(IJobExecutionContext context)
     {
-        return _exportHandler.ExportContactsToExcelOnDisk(Path.Combine(
+        return _exportHandler.ExportContactsToExcelOnDiskAsync(Path.Combine(
             _webHostEnvironment.ContentRootPath,
             _configuration["UnloadingDirectory"] ?? "",
             $"Contacts-{DateTime.Now:yyyy-MM-dd HH-mm}.xlsx"
