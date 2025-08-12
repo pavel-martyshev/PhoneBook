@@ -95,6 +95,9 @@ namespace PhoneBook.DataAccess.Migrations
 
                     b.HasIndex("ContactId");
 
+                    b.HasIndex("Number")
+                        .IsUnique();
+
                     b.ToTable("PhoneNumbers");
                 });
 

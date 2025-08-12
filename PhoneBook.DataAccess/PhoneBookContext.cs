@@ -33,6 +33,10 @@ public class PhoneBookContext(DbContextOptions<PhoneBookContext> options) : DbCo
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
+        modelBuilder.Entity<PhoneNumber>()
+            .HasIndex(p => p.Number)
+            .IsUnique();
+
         var baseType = typeof(BaseModel);
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes().Where(t => baseType.IsAssignableFrom(t.ClrType)))

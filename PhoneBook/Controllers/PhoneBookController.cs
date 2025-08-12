@@ -23,8 +23,15 @@ public class PhoneBookController(IConfiguration configuration, ContactsHandler c
             return BadRequest(ModelState);
         }
 
-        var newContactDto = await _contactsHandler.CreateContactAsync(contactDto);
-        return CreatedAtAction(nameof(GetContact), new { id = newContactDto.Id }, newContactDto);
+        try
+        {
+            var newContactDto = await _contactsHandler.CreateContactAsync(contactDto);
+            return CreatedAtAction(nameof(GetContact), new { id = newContactDto.Id }, newContactDto);
+        }
+        catch (ArgumentException e)
+        {
+            return Conflict(new { status = "error", message = e.Message });
+        }
     }
 
     [HttpPut]

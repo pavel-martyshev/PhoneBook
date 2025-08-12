@@ -30,7 +30,13 @@ public class UnitOfWorkBase(DbContext db) : IUnitOfWorkBase
     public Task RollbackTransactionAsync()
     {
         ObjectDisposedException.ThrowIf(_disposed, db);
-        return _db.Database.RollbackTransactionAsync();
+
+        if (_db.Database.CurrentTransaction != null)
+        {
+            return _db.Database.RollbackTransactionAsync();
+        }
+
+        return Task.CompletedTask;
     }
 
     public void Dispose()

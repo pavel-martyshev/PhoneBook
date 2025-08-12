@@ -55,6 +55,12 @@ namespace PhoneBook.DataAccess.Migrations
                 name: "IX_PhoneNumbers_ContactId",
                 table: "PhoneNumbers",
                 column: "ContactId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PhoneNumbers_Number",
+                table: "PhoneNumbers",
+                column: "Number",
+                unique: true);
         }
 
         /// <inheritdoc />

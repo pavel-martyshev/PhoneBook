@@ -1,6 +1,8 @@
-﻿using PhoneBook.Contracts.Dto;
+﻿using Microsoft.Data.SqlClient;
+using PhoneBook.Contracts.Dto;
 using PhoneBook.Contracts.Repositories;
 using PhoneBook.DataModels;
+using System.Text.RegularExpressions;
 
 namespace PhoneBook.Handlers;
 
@@ -50,9 +52,35 @@ public class ContactsHandler(IUnitOfWork uow)
                 .ToList()
         };
 
-        await _uow.BeginTransactionAsync();
-        await _uow.ContactRepository.CreateAsync(contact);
-        await _uow.SaveAsync();
+        try
+        {
+            await _uow.BeginTransactionAsync();
+            await _uow.ContactRepository.CreateAsync(contact);
+            await _uow.SaveAsync();
+        }
+        catch (Exception e)
+        {
+            if (e.InnerException is SqlException sqlError && sqlError.Number == 2601)
+            {
+                var match = Regex.Match(e.InnerException.Message, @":\s*\(+(.*?)\)");
+
+                if (match.Success)
+                {
+                    var duplicatedPhoneNumber = match
+                        .ToString()
+                        .Replace(": (", "")
+                        .TrimEnd(')');
+
+                    throw new ArgumentException($"Номер {duplicatedPhoneNumber} уже существует.");
+                }
+            }
+
+            throw;
+        }
+        finally
+        {
+            await _uow.RollbackTransactionAsync();
+        }
 
         return new ContactDto
         {
@@ -78,6 +106,7 @@ public class ContactsHandler(IUnitOfWork uow)
 
         if (contact is null)
         {
+            await _uow.RollbackTransactionAsync();
             return null;
         }
 
@@ -85,34 +114,33 @@ public class ContactsHandler(IUnitOfWork uow)
         contact.MiddleName = contactDto.MiddleName;
         contact.LastName = contactDto.LastName;
 
-        foreach (var number in contact.PhoneNumbers)
+        foreach (var phoneNumber in contact.PhoneNumbers)
         {
-            if (!contactDto.PhoneNumbers.Any(p => p.Number == number.Number))
+            if (!contactDto.PhoneNumbers.Any(p => p.Number == phoneNumber.Number))
             {
-                number.IsDeleted = true;
+                phoneNumber.IsDeleted = true;
             }
         }
 
-        foreach (var dtoNumber in contactDto.PhoneNumbers)
+        foreach (var dtoPhoneNumber in contactDto.PhoneNumbers)
         {
-            if (!contact.PhoneNumbers.Any(p => p.Number == dtoNumber.Number))
+            var phoneNumber = contact.PhoneNumbers
+                .Where(p => p.Number == dtoPhoneNumber.Number)
+                .FirstOrDefault();
+
+            if (phoneNumber is null)
             {
-                var number = new PhoneNumber()
+                var newPhoneNumber = new PhoneNumber
                 {
-                    Number = dtoNumber.Number,
-                    Type = dtoNumber.Type
+                    Number = dtoPhoneNumber.Number,
+                    Type = dtoPhoneNumber.Type
                 };
 
-                contact.PhoneNumbers.Add(number);
+                contact.PhoneNumbers.Add(newPhoneNumber);
             }
-
-            if (contact.PhoneNumbers.Any(p => p.Number == dtoNumber.Number && p.Type != dtoNumber.Type))
+            else
             {
-                var number = contact.PhoneNumbers
-                    .Where(p => p.Number == dtoNumber.Number)
-                    .FirstOrDefault();
-
-                number!.Type = dtoNumber.Type;
+                phoneNumber.Type = dtoPhoneNumber.Type;
             }
         }
 

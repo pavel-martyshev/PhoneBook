@@ -12,7 +12,7 @@ using PhoneBook.DataAccess;
 namespace PhoneBook.DataAccess.Migrations
 {
     [DbContext(typeof(PhoneBookContext))]
-    [Migration("20250804124901_InitialCreate")]
+    [Migration("20250812071827_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -97,6 +97,9 @@ namespace PhoneBook.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ContactId");
+
+                    b.HasIndex("Number")
+                        .IsUnique();
 
                     b.ToTable("PhoneNumbers");
                 });
